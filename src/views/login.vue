@@ -19,8 +19,8 @@
           <el-input v-model="loginForm.password"></el-input>
         </el-form-item>
         <el-form-item class="loginBtn">
-          <el-button type="primary">登录</el-button>
-          <el-button type="info">重置</el-button>
+          <el-button type="primary" @click="login">登录</el-button>
+          <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -34,8 +34,8 @@ export default {
     return {
       // 登录表单的数据
       loginForm: {
-        username: "",
-        password: "",
+        username: "admin",
+        password: "123456",
       },
       // 登录表单的验证规则
       loginFormRules: {
@@ -55,7 +55,24 @@ export default {
       },
     };
   },
-  methods: {},
+  methods: {
+    // 重置
+    resetLoginForm() {
+      this.$refs.loginFormRef.resetFields();
+    },
+    // 登录
+    login() {
+      this.$refs.loginFormRef.validate(async (valid) => {
+        if (!valid) return this.$message.error("请输入完整的用户信息");
+        const { data: res } = await this.$http.post("login", this.loginForm);
+        // console.log(res);
+        if (res.meta.status !== 200) return this.$message.error("登录失败");
+        this.$message.success("登录成功");
+        window.sessionStorage.setItem("token", res.data.token);
+        this.$router.push("/home");
+      });
+    },
+  },
 };
 </script>
 
